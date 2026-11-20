@@ -1,0 +1,39 @@
+name: Build DAWALINK iOS Simulator
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "mobile/**"
+      - ".github/workflows/build-ios.yml"
+jobs:
+  ios:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Align Expo dependencies
+        run: npx expo install --fix
+      - name: Type-check
+        run: npm run typecheck
+      - name: Generate iOS native project
+        run: CI=1 npx expo prebuild --platform ios --no-install
+      - name: Build iOS Simulator app
+        run: |
+          xcodebuild -workspace ios/DAWALINK.xcworkspace -scheme DAWALINK -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+      - name: Package simulator app
+        run: |
+          APP_PATH="build/DerivedData/Build/Products/Release-iphonesimulator/DAWALINK.app"
+          test -d "$APP_PATH"
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" DAWALINK-iOS-Simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DAWALINK-iOS-Simulator
+          path: mobile/DAWALINK-iOS-Simulator.zip
+          retention-days: 14
