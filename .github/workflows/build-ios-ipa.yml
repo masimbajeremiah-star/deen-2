@@ -1,0 +1,28 @@
+name: Build DAWALINK signed iOS IPA
+on:
+  workflow_dispatch:
+jobs:
+  ios-ipa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install EAS CLI
+        run: npm install --global eas-cli
+      - name: Configure Expo project
+        working-directory: mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Missing EXPO_TOKEN GitHub Actions secret. Add an Expo access token in repository Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          eas project:info --non-interactive
+      - name: Build signed iOS IPA
+        working-directory: mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build --platform ios --profile production --non-interactive
