@@ -16,6 +16,7 @@ app.use("/api/reservations",rateLimit({limit:8,windowMs:60000}));
 app.use("/api/partners",rateLimit({limit:5,windowMs:60000}));
 app.use("/api/search",rateLimit({limit:45,windowMs:60000}));
 app.use("/api/pharmacy/login",rateLimit({limit:8,windowMs:60000}));
+app.use("/api/admin",rateLimit({limit:20,windowMs:60000}));
 
 const pool=process.env.DATABASE_URL?new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_URL.includes("render.com")?{rejectUnauthorized:false}:undefined}):null;
 let demo={
