@@ -19,3 +19,9 @@ This is a separate Expo React Native application, not a website wrapper.
 - Reservation requests use a cross-platform in-app form.
 - The API's database connection and secure partner identity management still need final setup. Do not use real patient data or rely on sample pharmacy inventory.
 - This is an MVP build, not a regulator-approved medicine dispensing or online pharmacy service.
+
+
+## Signed iPhone IPA (real device)
+The workflow `.github/workflows/build-ios-ipa.yml` uses Expo EAS cloud builds to create a signed iOS build (not a simulator app). Prerequisites are an Expo account, an Expo project linked to this app, an Expo access token stored as GitHub Actions secret `EXPO_TOKEN`, and Apple Developer Program membership with signing credentials configured in EAS. Once these prerequisites are completed, run the workflow from GitHub Actions. A successful production build is intended for App Store/TestFlight distribution; it does not automatically publish the app.
+
+To link the Expo project initially, from the mobile directory run `eas login` then `eas init` and commit the generated project ID in `app.json`. Configure Apple credentials through EAS credentials management. Add `EXPO_TOKEN` under repository Settings → Secrets and variables → Actions.
