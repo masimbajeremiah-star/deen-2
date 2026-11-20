@@ -24,3 +24,14 @@ Before live patient transactions: obtain written PPB classification and confirm 
 
 ## Deploy
 A Render service can build with `npm install` and start with `npm start`. Set `DATABASE_URL` to a managed PostgreSQL connection string for persistent data. Without it, the app runs in demo mode with in-memory data that resets on restart.
+
+
+## Native mobile app (Android + iOS)
+The separate Expo React Native app is in [mobile/](mobile/README.md). It is a real native app project, not a website wrapper.
+
+- Android and iOS source: `mobile/App.tsx`
+- Local phone testing: install Expo Go, then follow [mobile setup](mobile/README.md).
+- Android APK build: GitHub Actions workflow `.github/workflows/build-android.yml` builds an installable debug APK on mobile-source commits and stores it as a workflow artifact.
+- iOS App Store/TestFlight build requires an Apple Developer account and signing credentials; EAS project configuration is not yet linked.
+
+The website remains available at https://dawalink-kenya.onrender.com.
