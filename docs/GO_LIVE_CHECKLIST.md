@@ -1,0 +1,11 @@
+# Before real patient launch
+- Obtain written PPB advice on platform, online ordering/reservation, fulfilment, delivery, and participating pharmacy licence scope.
+- Confirm Digital Health Agency classification/certification requirements.
+- Complete ODPC controller/processor role mapping, registration and DPIA as applicable.
+- Replace demo pharmacy details and verify licence/premises/responsible pharmacist before listing.
+- Implement identity, MFA, role and organisation authorization; current partner routes are prototype-only and must not be exposed as a real pharmacy login.
+- Add audit events, encryption in transit/at rest, secure prescription upload with private access, retention/deletion controls and breach response.
+- Add pharmacy confirmation/decline UI and stock freshness expiry.
+- Add tested M-PESA integration only after merchant settlement, refunds and reconciliation are agreed.
+- Security testing, backups, monitoring and incident-response drills.
+- Test with synthetic data first. Do not enter actual patient information into the demo.
