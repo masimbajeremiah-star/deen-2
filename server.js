@@ -14,6 +14,7 @@ function rateLimit({limit=30,windowMs=60000}={}){return (req,res,next)=>{const k
 app.use("/api/reservations",rateLimit({limit:8,windowMs:60000}));
 app.use("/api/partners",rateLimit({limit:5,windowMs:60000}));
 app.use("/api/search",rateLimit({limit:45,windowMs:60000}));
+app.use("/api/pharmacy/login",rateLimit({limit:8,windowMs:60000}));
 
 const pool=process.env.DATABASE_URL?new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_URL.includes("render.com")?{rejectUnauthorized:false}:undefined}):null;
 let demo={
@@ -38,7 +39,7 @@ CREATE INDEX IF NOT EXISTS reservations_pharmacy_created_idx ON reservations(pha
 `;
 async function init(){if(!pool)return;await pool.query(schema);await pool.query("delete from stocks where pharmacy_id='pilot-001'");await pool.query("delete from pharmacies where id='pilot-001' and licence_number='DEMO-NOT-A-REAL-LICENCE'");await pool.query("delete from medicines m where m.id in ('med-1','med-2','med-3','med-4') and not exists(select 1 from stocks s where s.medicine_id=m.id) and not exists(select 1 from reservations r where r.medicine_id=m.id)");}
 const q=async(sql,args=[])=>{if(!pool)throw Error("Database not configured");return (await pool.query(sql,args)).rows};
-const authSecret=process.env.AUTH_TOKEN_SECRET;
+const authSecret=typeof process.env.AUTH_TOKEN_SECRET==="string"&&process.env.AUTH_TOKEN_SECRET.length>=32?process.env.AUTH_TOKEN_SECRET:null;
 
 function requirePartnerToken(req,res,next){if(!pool)return res.status(503).json({error:"Pharmacy accounts require the connected database."});if(!authSecret)return res.status(503).json({error:"Pharmacy authentication is not configured."});const supplied=(req.headers.authorization||"").replace(/^Bearer\s+/i,"");const claims=readPharmacyToken(supplied,authSecret);if(!claims||claims.pharmacyId!==req.params.id)return res.status(401).json({error:"Valid pharmacy sign-in required."});req.pharmacyUser=claims;next();}
 app.post("/api/pharmacy/login",async(req,res)=>{const {email,password}=req.body||{};if(typeof email!=="string"||typeof password!=="string"||!authSecret)return res.status(400).json({error:"Enter your pharmacy account credentials."});try{const rows=await q("select u.id,u.pharmacy_id,u.password_hash,u.role,u.active,p.status as pharmacy_status from pharmacy_users u join pharmacies p on p.id=u.pharmacy_id where lower(u.email)=lower($1) limit 1",[email.trim()]);const user=rows[0];if(!user||!user.active||user.pharmacy_status!=="APPROVED"||!verifyPassword(password,user.password_hash))return res.status(401).json({error:"Email or password is incorrect."});res.json({token:issuePharmacyToken(user,authSecret),expiresIn:43200,pharmacyId:user.pharmacy_id,role:user.role});}catch{res.status(500).json({error:"Sign-in is temporarily unavailable."});}});
