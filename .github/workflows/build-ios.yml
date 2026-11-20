@@ -26,7 +26,15 @@ jobs:
         run: CI=1 npx expo prebuild --platform ios --no-install
       - name: Build iOS Simulator app
         run: |
-          xcodebuild -workspace ios/DAWALINK.xcworkspace -scheme DAWALINK -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+          if [ -d ios/DAWALINK.xcworkspace ]; then
+            xcodebuild -workspace ios/DAWALINK.xcworkspace -scheme DAWALINK -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+          elif [ -d ios/DAWALINK.xcodeproj ]; then
+            xcodebuild -project ios/DAWALINK.xcodeproj -scheme DAWALINK -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+          else
+            echo "No generated DAWALINK Xcode workspace or project found"
+            ls -la ios
+            exit 1
+          fi
       - name: Package simulator app
         run: |
           APP_PATH="build/DerivedData/Build/Products/Release-iphonesimulator/DAWALINK.app"
