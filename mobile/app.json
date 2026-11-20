@@ -1,0 +1,1 @@
+{"expo":{"name":"DAWALINK","slug":"dawalink-kenya","version":"1.0.0","orientation":"portrait","userInterfaceStyle":"light","scheme":"dawalink","ios":{"supportsTablet":true,"bundleIdentifier":"ke.dawalink.app"},"android":{"package":"ke.dawalink.app","versionCode":1,"permissions":[]},"extra":{"eas":{"projectId":"REPLACE_WITH_EAS_PROJECT_ID"}}}}
